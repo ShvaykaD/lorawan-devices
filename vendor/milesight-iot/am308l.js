@@ -101,23 +101,6 @@ function milesight(bytes) {
             decoded.beep = bytes[i] === 1 ? "yes" : "no";
             i += 1;
         }
-        // HISTORY DATA (AM307)
-        else if (channel_id === 0x20 && channel_type === 0xce) {
-            var data = {};
-            data.timestamp = readUInt32LE(bytes.slice(i, i + 4));
-            data.temperature = readInt16LE(bytes.slice(i + 4, i + 6)) / 10;
-            data.humidity = readUInt16LE(bytes.slice(i + 6, i + 8)) / 2;
-            data.pir = bytes[i + 8] === 1 ? "trigger" : "idle";
-            data.light_level = bytes[i + 9];
-            data.co2 = readUInt16LE(bytes.slice(i + 10, i + 12));
-            // unit: iaq
-            data.tvoc = readUInt16LE(bytes.slice(i + 12, i + 14)) / 100;
-            data.pressure = readUInt16LE(bytes.slice(i + 14, i + 16)) / 10;
-            i += 16;
-
-            decoded.history = decoded.history || [];
-            decoded.history.push(data);
-        }
         // HISTORY DATA (AM308)
         else if (channel_id === 0x20 && channel_type === 0xce) {
             var data = {};
@@ -137,8 +120,8 @@ function milesight(bytes) {
             decoded.history = decoded.history || [];
             decoded.history.push(data);
         }
-        // HISTORY DATA (AM319 CH2O)
-        else if (channel_id === 0x20 && channel_type === 0xce) {
+        // HISTORY DATA (AM308) with tvoc unit: µg/m³
+        else if (channel_id === 0x21 && channel_type === 0xce) {
             var data = {};
             data.timestamp = readUInt32LE(bytes.slice(i, i + 4));
             data.temperature = readInt16LE(bytes.slice(i + 4, i + 6)) / 10;
@@ -146,33 +129,12 @@ function milesight(bytes) {
             data.pir = bytes[i + 8] === 1 ? "trigger" : "idle";
             data.light_level = bytes[i + 9];
             data.co2 = readUInt16LE(bytes.slice(i + 10, i + 12));
-            // unit: iaq
-            data.tvoc = readUInt16LE(bytes.slice(i + 12, i + 14)) / 100;
+            // unit: µg/m³
+            data.tvoc = readUInt16LE(bytes.slice(i + 12, i + 14));
             data.pressure = readUInt16LE(bytes.slice(i + 14, i + 16)) / 10;
             data.pm2_5 = readUInt16LE(bytes.slice(i + 16, i + 18));
             data.pm10 = readUInt16LE(bytes.slice(i + 18, i + 20));
-            data.hcho = readUInt16LE(bytes.slice(i + 20, i + 22)) / 100;
-            i += 22;
-
-            decoded.history = decoded.history || [];
-            decoded.history.push(data);
-        }
-        // HISTORY DATA (AM319 O3)
-        else if (channel_id === 0x20 && channel_type === 0xce) {
-            var data = {};
-            data.timestamp = readUInt32LE(bytes.slice(i, i + 4));
-            data.temperature = readInt16LE(bytes.slice(i + 4, i + 6)) / 10;
-            data.humidity = readUInt16LE(bytes.slice(i + 6, i + 8)) / 2;
-            data.pir = bytes[i + 8] === 1 ? "trigger" : "idle";
-            data.light_level = bytes[i + 9];
-            data.co2 = readUInt16LE(bytes.slice(i + 10, i + 12));
-            // unit: iaq
-            data.tvoc = readUInt16LE(bytes.slice(i + 12, i + 14)) / 100;
-            data.pressure = readUInt16LE(bytes.slice(i + 14, i + 16)) / 10;
-            data.pm2_5 = readUInt16LE(bytes.slice(i + 16, i + 18));
-            data.pm10 = readUInt16LE(bytes.slice(i + 18, i + 20));
-            data.o3 = readUInt16LE(bytes.slice(i + 20, i + 22)) / 100;
-            i += 22;
+            i += 20;
 
             decoded.history = decoded.history || [];
             decoded.history.push(data);
